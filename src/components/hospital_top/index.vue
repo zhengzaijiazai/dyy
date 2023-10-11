@@ -8,7 +8,25 @@
             </div>
             <div class="content-right">
                 <p>帮助中心</p>
-                <p><Login/></p>
+                <p v-if="User.userInfo.token">
+                    <el-dropdown>
+                        <span class="el-dropdown-link">
+                            {{User.userInfo.name}}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item>实名认证</el-dropdown-item>
+                                <el-dropdown-item>订单挂号</el-dropdown-item>
+                                <el-dropdown-item>就诊人管理</el-dropdown-item>
+                                <el-dropdown-item>退出登录</el-dropdown-item>
+
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </p>
+                <p v-else>
+                    <Login />
+                </p>
             </div>
         </div>
     </div>
@@ -17,15 +35,25 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 
+//引入计算属性
+import useUser from "@/store/modules/user";
+
+//user小仓库
+let User = useUser();
+
 let $router = useRouter()
-const goHome = ()=>{
+const goHome = () => {
     //编程式导航跳转首页
-    $router.push({path:'/Home'})
+    $router.push({ path: '/Home' })
 }
+
+
+
+//判断是否有data
 </script>
 
 <style scoped lang="scss">
-.top{
+.top {
     width: 100%;
     height: 70px;
     background-color: #fff;
@@ -36,36 +64,42 @@ const goHome = ()=>{
     justify-content: center;
     align-items: center;
     border-bottom: 1px solid rgba(128, 128, 128, 0.1);
-    .content{
+
+    .content {
         width: 1200px;
         height: 70px;
         display: flex;
         justify-content: space-between;
         background-color: #fff;
 
-        .content-left{
+        .content-left {
             display: flex;
             justify-content: center;
             align-items: center;
-            img{
+
+            img {
                 height: 50px;
             }
-            p{
+
+            p {
                 margin-left: 10px;
                 font-size: 1.7em;
                 color: #4da4ff;
             }
         }
-        .content-right{
+
+        .content-right {
             display: flex;
             justify-content: center;
             align-items: center;
-            p{
+
+            p {
                 margin-right: 10px;
                 cursor: pointer;
                 font-size: 15px;
                 color: grey;
-                &:hover{
+
+                &:hover {
                     color: #4da4ff;
                     font-weight: 900;
                 }

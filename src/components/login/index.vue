@@ -7,16 +7,18 @@
     <el-dialog v-model="Users.dialogFormVisible" title="登录/注册">
       <div class="contain">
         <!-- 这是左侧 -->
-        <div class="loginfrom" v-if="sence=='0'">
-          <el-form>
+        <div class="loginfrom" v-if="sence == '0'">
+          <el-form :model="loginInfo">
             <el-form-item label="">
-              <el-input :prefix-icon="User" placeholder="请输入手机号码"></el-input>
-              <el-input :prefix-icon="Lock" placeholder="请输入手机验证码"></el-input>
-              <el-button>获取验证码</el-button>
+              <el-input :prefix-icon="User" placeholder="请输入手机号码" v-model="loginInfo.phone"></el-input>
+              <el-input :prefix-icon="Lock" placeholder="请输入手机验证码" v-model="Users.code"></el-input>
+              <el-button :disabled="flag || !isPhone" @click="getCode">
+                获取验证码 <span v-if="flag">{{ overtime }}</span>
+              </el-button>
             </el-form-item>
           </el-form>
           <div class="loginbottom">
-            <el-button type="">用户登录</el-button>
+            <el-button type="success" @click="goLogin" :disabled="!isPhone || Users.code.length !== 6">用户登录</el-button>
             <p @click="handelechange('1')">微信扫码登录</p>
             <svg t="1696843975001" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
               p-id="5094" width="32" height="32">
@@ -68,7 +70,9 @@
           </div>
           <div class="codebuttom">
             <p>冬预约官方指定平台</p>
-            <p><x>快速挂号&nbsp;安全放心</x></p>
+            <p>
+              <x>快速挂号&nbsp;安全放心</x>
+            </p>
           </div>
         </div>
       </div>
@@ -87,17 +91,83 @@
 //引入小图标
 import { User, Lock } from '@element-plus/icons-vue'
 
-import { ref } from 'vue';
+import { ref, reactive, computed } from 'vue';
 
+//引入登录方法
+
+//引入user小仓库
+import useUser from '@/store/modules/user.ts'
+import { ElMessage } from 'element-plus';
+
+//引入登录数据返回类型
+
+
+let Users = useUser()
 //控制微信是否扫码登录
 let sence = ref<string>('0');
-
-import useUser from '@/store/modules/user'
-let Users = useUser()
+//控制倒计时显示
+let flag = ref<boolean>(false);
+//这是时间倒计时
+let overtime = ref<number>(0);
 
 //微信扫码登录显示方法
-const handelechange = (text:string)=>{
+const handelechange = (text: string) => {
   sence.value = text
+}
+//由于发送不到手机上面 就直接后台返回这个数据 所以这里有两个参数
+//电话号码和验证码的类型
+//电话号码和验证码
+let loginInfo = reactive({
+  phone: '',
+  code: ''
+})
+
+//计算电话号码是否正确
+let isPhone = computed(() => {
+  let reg = /1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}/
+
+  return reg.test(loginInfo.phone)
+})
+//电话正确后点击获取验证码方法
+const getCode = () => {
+  //验证码倒计时
+  flag.value = true
+  overtime.value = 60
+  let timer = setInterval(() => {
+    if (overtime.value == 1) {
+      flag.value = false
+      clearInterval(timer);
+    }
+    overtime.value--
+  }, 1000)
+  //发送验证码请求 
+  try {
+    Users.getCode(loginInfo.phone)
+    loginInfo.code = Users.code
+  } catch (error: any) {
+    ElMessage({
+      message: '获取验证码失败',
+      type: "error"
+    })
+  }
+}
+
+//登录方法
+const goLogin = async () => {
+  try {
+    await Users.goLogin(loginInfo)
+  } catch (error:any) {
+    ElMessage({
+      message: error.message,
+      type: 'error'
+    })
+  }
+}
+</script>
+
+<script lang="ts">
+export default {
+  name: 'login'
 }
 </script>
 
@@ -107,7 +177,8 @@ const handelechange = (text:string)=>{
     width: 100%;
     border-bottom: 2px solid rgba(211, 211, 211, 0.479);
   }
-  :deep(.el-dialog__footer){
+
+  :deep(.el-dialog__footer) {
     border-top: 2px solid rgba(211, 211, 211, 0.479);
   }
 }
@@ -155,18 +226,22 @@ const handelechange = (text:string)=>{
 
       p {
         margin: 15px;
-        &:hover{
+
+        &:hover {
           color: #9cceff;
         }
       }
     }
   }
-  .wechatlogin{
+
+  .wechatlogin {
     flex: 5;
     text-align: center;
-    p{
+
+    p {
       margin-top: 10px;
-      &:hover{
+
+      &:hover {
         color: #9cceff;
       }
     }
@@ -175,30 +250,36 @@ const handelechange = (text:string)=>{
   .code {
     flex: 5;
 
-    .codetop{
+    .codetop {
       display: flex;
-      div{
+
+      div {
         flex: 5;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        *{
+
+        * {
           margin-bottom: 10px;
         }
-        img{
+
+        img {
           width: 150px;
         }
       }
     }
-    .codebuttom{
+
+    .codebuttom {
       text-align: center;
       margin-top: 50px;
       font-size: 25px;
-      p{
+
+      p {
         margin-top: 20px;
         margin-bottom: 20px;
       }
     }
   }
-}</style>
+}
+</style>

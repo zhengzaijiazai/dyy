@@ -55,7 +55,7 @@
             >
                 <div class="title">{{ Department?.depname }}</div>
                 <ul class="elcontent">
-                    <li v-for="(item,index2) in Department.children" @click="changedialog">
+                    <li v-for="(item,index2) in Department.children" @click="changedialog(item)">
                         {{ item.depname }}
                     </li>
                 </ul>
@@ -80,20 +80,43 @@ import useDetailStore from '@/store/modules/hospitalDeatail'
 import useDepartmentData from '@/store/modules/DepartmentData'
 //引入user仓库
 import useUser from '@/store/modules/user';
+import { ref } from 'vue';
 
+//引入路由 
+import { useRouter,useRoute } from 'vue-router';
+
+//详情数据
 let DetailStore = useDetailStore()
+//科室数据
 let DepartmentData = useDepartmentData()
+//用户小仓库
 let User = useUser();
 // console.log(DepartmentData);
 
+//引入路由router
+let $router = useRouter();
+let $route = useRoute();
 
-import { ref } from 'vue';
 
 //elementplus 属性
 const tabPosition = ref<string>('left')
 
-const changedialog = ()=>{
-    User.dialogFormVisible = true;
+//这是预约挂号页面  点击跳转
+const changedialog = (item:any)=>{
+    if(!localStorage.getItem('user')){
+        User.dialogFormVisible = true;
+    }
+    //路由跳转加带参 发请求
+    console.log($route);
+    console.log(item);
+    
+    
+    $router.push(
+        {
+            path:'/Hospital/reservation_step1',
+            query:{hoscode:$route.query.hoscode,depcode:item.depcode}
+        }
+    );
 }
 
 
@@ -105,7 +128,7 @@ const changedialog = ()=>{
 //引入数据类型
 // import type { HospitalDepartmentData } from '@/api/hospital/type'
 //引入路由
-// import { useRoute } from 'vue-router';
+// import { useRoute, useRouter } from 'vue-router';
 //pinia
 // console.log(DetailStore);
 // let $route = useRoute()

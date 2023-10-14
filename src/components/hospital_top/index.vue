@@ -18,7 +18,7 @@
                                 <el-dropdown-item>实名认证</el-dropdown-item>
                                 <el-dropdown-item>订单挂号</el-dropdown-item>
                                 <el-dropdown-item>就诊人管理</el-dropdown-item>
-                                <el-dropdown-item>退出登录</el-dropdown-item>
+                                <el-dropdown-item @click="outLogin">退出登录</el-dropdown-item>
 
                             </el-dropdown-menu>
                         </template>
@@ -47,7 +47,14 @@ const goHome = () => {
     $router.push({ path: '/Home' })
 }
 
-
+//退出登录 删token和切换显示
+const outLogin = () => {
+    //删除token页面刷新
+    //还需要删除仓库的数据 因为仓库的数据已经得到
+    User.loginOut();
+    //路由跳转
+    $router.push({path:'/Home'});
+}
 
 //判断是否有data
 </script>

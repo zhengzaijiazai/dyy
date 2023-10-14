@@ -24,3 +24,12 @@ import { ElMessage } from 'element-plus';
 具体可以去官网里面搜索
 
 axios的封装  拦截器
+
+
+微信二维码登录流程
+
+1.去微信开放平台注册一个账号 https://open.weixin.qq.com/cgi-bin/index?t=home/index&lang=zh_CN
+
+2.想要使用微信登录需要 花300元开通  
+
+3.微信公众平台去查看使用文档 https://mp.weixin.qq.com/

@@ -1,4 +1,4 @@
-import { ResponseData } from '../home/type'
+import { ResponseData } from '../home/type';
 
 // 登录请求数据
 export interface postData{
@@ -13,4 +13,14 @@ export interface userMessage{
 
 export interface userLoginData extends ResponseData{
     data:userMessage
+}
+
+export interface wxLoginMessage{
+    "redirectUri": string,
+    "appid": string,
+    "scope": string,
+    "state": string
+} 
+export interface wxLoginMessageData extends ResponseData{
+    data:wxLoginMessage
 }
